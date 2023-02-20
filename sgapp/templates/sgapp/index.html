@@ -1,0 +1,181 @@
+{% load bootstrap5 %}
+<style>
+  .event-container {
+    font-family: 'Montserrat', sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .event-container h3.year {
+    font-size: 40px;
+    text-align: center;
+    border-bottom: 1px solid #b1b1b1;
+  }
+  
+  .event-container .event {
+    box-shadow: 0 2px 60px 0px rgba(60, 60, 200, 0.4);
+    display: flex;
+    border-style: solid;
+    border-radius: 0px;
+    border-width: 2px;
+    border-color: #4328b7;
+    margin: 32px 0;
+    background-color: #f2f2f2;
+  }
+  
+  .event .event-left {
+    background: #1b1f50;
+    min-width: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    padding: 8px 48px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 0px 0 0 0px;
+  }
+  
+  .event .event-left .date {
+    font-size: 56px;
+  }
+  
+  .event .event-left .month {
+    font-size: 16px;
+    font-weight: normal;
+  }
+  
+  .event .event-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 24px;
+  }
+  
+  .event .event-right h3.event-title {
+    font-size: 24px;
+    margin: 24px 0 10px 0;
+    color: #1b1f50;
+    text-transform: uppercase;
+  }
+  #button.btn.btn-primary {
+  background-color: #1b1f50;
+  border-radius: 0px 0 0 0px
+}
+
+  .event .event-right .event-timing {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 150px;
+    padding: 8px;
+    border-radius: 0px;
+    margin: 24px 0;
+    font-size: 14px;
+    float: right;
+  }
+  
+  .event .event-right .event-timing a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  @media (max-width: 550px) {
+    .event {
+      flex-direction: column;
+    }
+  
+    .event .event-left {
+      padding: 0;
+      border-radius: 0px 0px 0 0;
+    }
+  
+    .event .event-left .event-date .date,
+    .event .event-left .event-date .month {
+      display: inline-block;
+      font-size: 24px;
+    }
+  
+    .event .event-left .event-date {
+      padding: 10px 0;
+    }
+  }
+.phone-field-ext, .phone-field-ext+input {
+  display: none;
+}
+</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Szkolenia</title>
+
+  {% bootstrap_css %}
+  {% bootstrap_javascript %}
+  {% bootstrap_messages %}
+</head>
+  
+  <body style="background-color: #101535; height: 1000px">
+    <div class="event-container">
+      {% for training in trainings %}
+      <div class="event">
+        <div class="event-left">
+          <div class="event-date">
+            <div class="date">{{ training.training_date|date:'d' }}</div>
+            <div class="month">{{ training.training_date|date:'F' }}</div>
+          </div>
+        </div>
+  
+        <div class="event-right">
+          <h3 class="event-title">{{ training.training_type }}</h3>
+          <div class="event-price">
+            Inwestycja: {{ training.training_price }}zł
+          </div>
+  
+          <div class="event-description">
+            Lokalizacja: {{ training.venue }}
+          </div>
+  
+          <div class="event-timing">
+            <button type="button" id="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="{{ training.id }}">
+              zapisz sie
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <li>
+        Nie ma jeszcze żadnego szkolenia
+      </li>
+      {% endfor %}
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Zapisz na szkolenie</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form class="training-form" action="{% url 'sgapp:index' %}" method="post">
+                {% csrf_token %}
+                <p>{{ form.as_p }}</p>
+                <input type="hidden" name="training" id="training">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zamknij</button>
+              <button type="submit" class="btn btn-primary">Zapisz się</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        // Znajdujemy wszystkie przyciski "zapisz się" i dodajemy do nich obsługę zdarzenia "click"
+        const buttons = document.querySelectorAll('[data-bs-target="#exampleModal"]');
+        buttons.forEach(button => {
+          button.addEventListener('click', () => {
+            const trainingId = button.dataset.id;
+            // Znajdujemy pole "training" w formularzu i przypisujemy do niego wartość `trainingId`
+            const trainingField = document.querySelector('#training');
+            trainingField.value = trainingId
+          });
+  });
+      </script>
